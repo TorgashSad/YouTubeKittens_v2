@@ -1,0 +1,9 @@
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+# My ignored files
+config.properties
+src/main/resources/client_secret.json
