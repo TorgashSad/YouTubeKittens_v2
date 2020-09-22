@@ -1,6 +1,5 @@
 package com.torgashsad.youtubekittens;
 
-import javassist.NotFoundException;
 import lombok.AllArgsConstructor;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -11,27 +10,32 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
-import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @AllArgsConstructor
 public class YouTubeKittensBot extends TelegramLongPollingBot {
-
+    static {
+        List<String> Keys = new ArrayList<>();
+        for (String animal : YouTubeKittensBot.animals) {
+            Keys.add("Show me " + animal + "!");
+        }
+        animalKeys=Keys;
+    }
     final private static int RECONNECT_PAUSE = 10000;
     final private static List<String> serviceMsgs = Arrays.asList("/start", "/help");
     final private static List<String> animals = Arrays.asList("kittens", "puppies", "parrots", "hamsters");
-    final private static List<String> animalKeys = getKeys();
+    final private static List<String> animalKeys;
     final private static List<String> allKeys = Stream.concat(serviceMsgs.stream(), animalKeys.stream())
             .collect(Collectors.toList());
-    final private static Map<String,String> map = new LinkedHashMap<>();
+    final private static Map<String, String> map = new LinkedHashMap<>();
 
-    String userName;
+    final private String userName;
 
-    String token;
+    final private String token;
 
-    YouTubeKittensService MyYouTubeKittensService;
+    final private YouTubeKittensService MyYouTubeKittensService;
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -85,7 +89,7 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
 
     // Принимает список строк, возвращает объект типа ReplyKeyboardMarkup,
     // представляющий из себя клавиатуру с кнопками, ссответствующими списку строк
-    private static ReplyKeyboardMarkup getReplyKeyboardMarkUp() {
+    private ReplyKeyboardMarkup getReplyKeyboardMarkUp() {
         KeyboardRow key = new KeyboardRow();
         key.addAll(animalKeys);
         List<KeyboardRow> keyboard = new ArrayList<>();
@@ -97,21 +101,13 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
     }
 
     // Преобразует список зверей для поиска в формат ("Show me " + animal + "!")
-    private static List<String> getKeys() {
-        List<String> Keys = new ArrayList<>();
-        for (String animal : YouTubeKittensBot.animals) {
-            Keys.add("Show me " + animal + "!");
-        }
-        return Keys;
-    }
-
     // На основании введённой пользователем строки возвращает строку ответа
     private String getReply(String inputText) {
         if (util.stringContainsItemFromList(inputText, animalKeys)) {
             try {
                 return MyYouTubeKittensService.getRandomAnimalVideoURL(map.get(inputText));
             }
-            catch (IOException | NotFoundException e) {
+            catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -119,14 +115,15 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
         if (inputText.startsWith("/start")) {
             return "Hello. This is start message. PRESS A BUTTON TO GET ANIMALS!!!";
         }
-        if (inputText.startsWith("/help"))
+        if (inputText.startsWith("/help")) {
             return "This is a bot that sends you random videos with animals according to your preferences.\n" +
                     "Just choose a button and get an animal video specified by the button.\n" +
-                    "All videos are random and tend to not repeat, but rarely repetitions occur.\n"+
-                    "In that unfortunate case, just click the button once more!\n"+
+                    "All videos are random and tend to not repeat, but rarely repetitions occur.\n" +
+                    "In that unfortunate case, just click the button once more!\n" +
                     "type /start to restart the but if something have gone wrong.\n" +
                     "type /help to get this help again";
-        else return "I have no answer for you :(";
+        }
+        return "I have no answer for you :(";
     }
 
     //Вспомогательные методы

@@ -23,22 +23,22 @@ public class YouTubeKittensService {
     private static final long MaxResults = 50;
     private static final Random rand = new Random();
 
-    YouTube youtubeService;
+    private final YouTube youtubeService;
 
     /**
      * Запрашивает у YouTube список первых 50 видео c милымы животными по запросу,
      * определённому строкой q, возвращает URL со случайным видео из этого списка
      *
+     * @param query строка
      * @throws IOException, NotFoundException
      */
-
-    public String getRandomAnimalVideoURL(String q) throws IOException, NotFoundException {
+    public String getRandomAnimalVideoURL(String query) throws IOException, NotFoundException {
         // Define and execute the API request
         YouTube.Search.List request = youtubeService.search()
                 .list("snippet");
-        logger.info("YouTube querry happened to be:"+adjs.get(rand.nextInt(adjs.size())) + " " + q);
+        logger.info("YouTube query happened to be:"+adjs.get(rand.nextInt(adjs.size())) + " " + query);
         SearchListResponse response = request.setMaxResults(MaxResults) //Количество результатов в ответе
-                    .setQ(adjs.get(rand.nextInt(adjs.size())) + " " + q) //Поисковой запрос
+                    .setQ(adjs.get(rand.nextInt(adjs.size())) + " " + query) //Поисковой запрос
                     .setType("video") //искать только видео
                     .execute(); //Отправка запроса и получение ответа в response
         return YouTubeURLBeginning + getYouTubeVideoId(response); //Вернуть URL c котятами
@@ -48,10 +48,8 @@ public class YouTubeKittensService {
     //извлекает Id случайного видео в формате String из ответа YouTube форматаSearchListResponse.
     //Если по какой-то причине Id не был найден - кидает NotFoundException.
     private static String getYouTubeVideoId(SearchListResponse response) throws NotFoundException {
-        Optional<String> Id = response.getItems().stream().map(item ->
+        Optional<String> id = response.getItems().stream().map(item ->
                 item.getId().getVideoId()).skip(rand.nextInt(response.getItems().size())).findAny();
-        if (Id.isPresent()) {
-            return Id.get();
-        } else throw new NotFoundException("There is no Id found in the response.");
+        return id.orElseThrow(() -> new NotFoundException("There is no Id found in the response."));
     }
 }

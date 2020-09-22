@@ -21,15 +21,15 @@ public class YouTubeKittensApp {
         //Читаем файл настроек, в которых хранится Telegram Bot Token
         FileInputStream fis;
         Properties property = new Properties();
-        String TelegramBotToken = null;
+        String telegramBotToken = null;
         try {
             fis = new FileInputStream("config.properties");
             property.load(fis);
-            TelegramBotToken = property.getProperty("TelegramBotToken");
+            telegramBotToken = property.getProperty("TelegramBotToken");
         } catch (IOException e) {
-            logger.error("Error: properties file is absent!");
+            logger.error("Error: properties file is absent!", e);
         }
-        YouTubeKittensBot YouTubeKittensBot = new YouTubeKittensBot("YouTubeKittensBot", TelegramBotToken, MyService);
+        YouTubeKittensBot YouTubeKittensBot = new YouTubeKittensBot("YouTubeKittensBot", telegramBotToken, MyService);
         YouTubeKittensBot.botConnect();
     }
 }
