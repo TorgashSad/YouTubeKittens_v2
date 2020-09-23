@@ -15,7 +15,8 @@ public class YouTubeKittensApp {
 
     public static void main(String[] args)
             throws GeneralSecurityException, IOException {
-        YouTubeKittensService MyService = new YouTubeKittensService(YTServiceSupplier.getService()); //Получаем серсис YouTube
+        //Получаем серсис YouTube
+        //YouTubeKittensService MyService = new YouTubeKittensService(YTServiceSupplier.getService());
         ApiContextInitializer.init(); //Initialization of ApiContext
 
         //Читаем файл настроек, в которых хранится Telegram Bot Token
@@ -29,7 +30,7 @@ public class YouTubeKittensApp {
         } catch (IOException e) {
             logger.error("Error: properties file is absent!", e);
         }
-        YouTubeKittensBot YouTubeKittensBot = new YouTubeKittensBot("YouTubeKittensBot", telegramBotToken, MyService);
+        YouTubeKittensBot YouTubeKittensBot = new YouTubeKittensBot("YouTubeKittensBot", telegramBotToken);
         YouTubeKittensBot.botConnect();
     }
 }

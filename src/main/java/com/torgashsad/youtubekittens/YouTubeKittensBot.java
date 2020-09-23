@@ -1,5 +1,7 @@
 package com.torgashsad.youtubekittens;
 
+import com.torgashsad.youtubekittens.common.SystemCommands;
+import com.torgashsad.youtubekittens.common.UserCommands;
 import lombok.AllArgsConstructor;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
@@ -10,26 +12,22 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.Keyboard
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @AllArgsConstructor
 public class YouTubeKittensBot extends TelegramLongPollingBot {
 
     final private static int RECONNECT_PAUSE = 10000;
-    final private static List<String> serviceMsgs = Arrays.asList("/start", "/help");
     final private static List<String> animals = Arrays.asList("kittens", "puppies", "parrots", "hamsters");
-    final private static List<String> animalKeys = getKeys();
-    final private static List<String> allKeys = Stream.concat(serviceMsgs.stream(), animalKeys.stream())
-            .collect(Collectors.toList());
-    final private static Map<String, String> map = new LinkedHashMap<>();
 
     final private String userName;
 
     final private String token;
 
-    final private YouTubeKittensService MyYouTubeKittensService;
 
     @Override
     public void onUpdateReceived(Update update) {
@@ -37,14 +35,11 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
         Long chatId = update.getMessage().getChatId();
         String inputText = update.getMessage().getText();
 
-        for (int i=0; i<animals.size(); i++) {
-            map.put(animalKeys.get(i), animals.get(i));
-        } //создаём отображение animalKeys (ключи) на animals (значения)
-        if (util.stringContainsItemFromList(inputText, allKeys)) {
+        if (util.userStringCheck(inputText)) {
             SendMessage message = new SendMessage();
             message.setChatId(chatId);
             message.setReplyMarkup(getReplyKeyboardMarkUp());
-            String reply = getReply(inputText);
+            String reply = util.getCommand(inputText).getResponse;
             message.setText(reply);
             try {
                 execute(message);
@@ -85,7 +80,7 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
     // представляющий из себя клавиатуру с кнопками, ссответствующими списку строк
     private ReplyKeyboardMarkup getReplyKeyboardMarkUp() {
         KeyboardRow key = new KeyboardRow();
-        key.addAll(animalKeys);
+        key.addAll(UserCommands.stream().map(UserCommands::getButtonText).collect(Collectors.toList()));
         List<KeyboardRow> keyboard = new ArrayList<>();
         keyboard.add(key);
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
@@ -94,46 +89,32 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
         return replyKeyboardMarkup;
     }
 
-    // Преобразует список зверей для поиска в формат ("Show me " + animal + "!")
-    // На основании введённой пользователем строки возвращает строку ответа
-    private String getReply(String inputText) {
-        if (util.stringContainsItemFromList(inputText, animalKeys)) {
-            try {
-                return MyYouTubeKittensService.getRandomAnimalVideoURL(map.get(inputText));
-            }
-            catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-        //сервисные команды из serviceMsgs
-        if (inputText.startsWith("/start")) {
-            return "Hello. This is start message. PRESS A BUTTON TO GET ANIMALS!!!";
-        }
-        if (inputText.startsWith("/help")) {
-            return "This is a bot that sends you random videos with animals according to your preferences.\n" +
-                    "Just choose a button and get an animal video specified by the button.\n" +
-                    "All videos are random and tend to not repeat, but rarely repetitions occur.\n" +
-                    "In that unfortunate case, just click the button once more!\n" +
-                    "type /start to restart the but if something have gone wrong.\n" +
-                    "type /help to get this help again";
-        }
-        return "I have no answer for you :(";
-    }
-
-    // Преобразует список зверей для поиска в формат ("Show me " + animal + "!")
-    private static List<String> getKeys() {
-        List<String> Keys = new ArrayList<>();
-        for (String animal : YouTubeKittensBot.animals) {
-            Keys.add("Show me " + animal + "!");
-        }
-        return Keys;
-    }
-
     //Вспомогательные методы
     public static class util {
-        // Проверяет, содержится ли в строке inputStr какой либо элемент из items
-        public static boolean stringContainsItemFromList(String inputStr, List<String> items) {
-            return items.stream().anyMatch(inputStr::contains);
+
+        /**
+         * Данный метод проверяет, содержится ли сообщение пользователя в списке достпуных команд.
+         * Принимает строку, введённую пользователем
+         * Возвращает true если содержится, иначе false
+         */
+        public static boolean userStringCheck (String inputText) {
+            return UserCommands.stream().map(UserCommands::getButtonText).anyMatch(n -> n.equals(inputText)) ||
+                    SystemCommands.stream().map(SystemCommands::getButtonText).anyMatch(n -> n.equals(inputText));
+        }
+
+        /**
+         * Данный метод возвращает объект, реализующий интерфейс Command, соответствующий строке inputText.
+         */
+        public static Object getCommand (String inputText) {
+            Optional<SystemCommands> fromSC = SystemCommands.stream()
+                    .filter(d -> d.getButtonText().equals(inputText))
+                    .findAny();
+            Optional<UserCommands> fromUC = UserCommands.stream()
+                    .filter(d -> d.getButtonText().equals(inputText))
+                    .findAny();
+            if (fromSC.isPresent()) return fromSC;
+            else
+            return fromUC;
         }
     }
 }

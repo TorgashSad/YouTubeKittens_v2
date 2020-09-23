@@ -2,8 +2,6 @@ package com.torgashsad.youtubekittens;
 
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.SearchListResponse;
-import javassist.NotFoundException;
-import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,8 +11,10 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
-@AllArgsConstructor
+
 public class YouTubeKittensService {
+
+    public static final YouTubeKittensService INSTANCE = new YouTubeKittensService();
 
     private static final Logger logger = LogManager.getLogger(YouTubeKittensService.class);
 
@@ -25,31 +25,49 @@ public class YouTubeKittensService {
 
     private final YouTube youtubeService;
 
+    private YouTubeKittensService() {
+        try {
+            this.youtubeService = YTServiceSupplier.getService();
+        } catch (Exception e) {
+            logger.error("Error on initialization YouTubeService", e);
+            throw new RuntimeException();
+        }
+    }
+
     /**
      * Запрашивает у YouTube список первых 50 видео c милымы животными по запросу,
      * определённому строкой q, возвращает URL со случайным видео из этого списка
      *
      * @param query строка
-     * @throws IOException, NotFoundException
      */
-    public String getRandomAnimalVideoURL(String query) throws IOException, NotFoundException {
+    public Optional<String> getRandomAnimalVideoURL(String query) {
         // Define and execute the API request
-        YouTube.Search.List request = youtubeService.search()
-                .list("snippet");
+        YouTube.Search.List request;
+        try {
+            request = youtubeService.search()
+                    .list("snippet");
+        } catch (IOException e) {
+            logger.error(e);
+            return Optional.empty();
+        }
         logger.info("YouTube query happened to be:"+adjs.get(rand.nextInt(adjs.size())) + " " + query);
-        SearchListResponse response = request.setMaxResults(MaxResults) //Количество результатов в ответе
-                    .setQ(adjs.get(rand.nextInt(adjs.size())) + " " + query) //Поисковой запрос
-                    .setType("video") //искать только видео
-                    .execute(); //Отправка запроса и получение ответа в response
-        return YouTubeURLBeginning + getYouTubeVideoId(response); //Вернуть URL c котятами
+        try {
+            SearchListResponse response = request.setMaxResults(MaxResults) //Количество результатов в ответе
+                        .setQ(adjs.get(rand.nextInt(adjs.size())) + " " + query) //Поисковой запрос
+                        .setType("video") //искать только видео
+                        .execute();
+            //Вернуть URL c котятами
+            return getYouTubeVideoId(response).map(id -> YouTubeURLBeginning + id);
+        } catch (IOException e) {
+            logger.error(e);
+        }
+        return Optional.empty();
 
     }
 
     //извлекает Id случайного видео в формате String из ответа YouTube форматаSearchListResponse.
-    //Если по какой-то причине Id не был найден - кидает NotFoundException.
-    private static String getYouTubeVideoId(SearchListResponse response) throws NotFoundException {
-        Optional<String> id = response.getItems().stream().map(item ->
+    private Optional<String> getYouTubeVideoId(SearchListResponse response) {
+        return response.getItems().stream().map(item ->
                 item.getId().getVideoId()).skip(rand.nextInt(response.getItems().size())).findAny();
-        return id.orElseThrow(() -> new NotFoundException("There is no Id found in the response."));
     }
 }
