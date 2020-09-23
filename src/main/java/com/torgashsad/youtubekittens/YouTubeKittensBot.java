@@ -16,17 +16,11 @@ import java.util.stream.Stream;
 
 @AllArgsConstructor
 public class YouTubeKittensBot extends TelegramLongPollingBot {
-    static {
-        List<String> Keys = new ArrayList<>();
-        for (String animal : YouTubeKittensBot.animals) {
-            Keys.add("Show me " + animal + "!");
-        }
-        animalKeys=Keys;
-    }
+
     final private static int RECONNECT_PAUSE = 10000;
     final private static List<String> serviceMsgs = Arrays.asList("/start", "/help");
     final private static List<String> animals = Arrays.asList("kittens", "puppies", "parrots", "hamsters");
-    final private static List<String> animalKeys;
+    final private static List<String> animalKeys = getKeys();
     final private static List<String> allKeys = Stream.concat(serviceMsgs.stream(), animalKeys.stream())
             .collect(Collectors.toList());
     final private static Map<String, String> map = new LinkedHashMap<>();
@@ -124,6 +118,15 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
                     "type /help to get this help again";
         }
         return "I have no answer for you :(";
+    }
+
+    // Преобразует список зверей для поиска в формат ("Show me " + animal + "!")
+    private static List<String> getKeys() {
+        List<String> Keys = new ArrayList<>();
+        for (String animal : YouTubeKittensBot.animals) {
+            Keys.add("Show me " + animal + "!");
+        }
+        return Keys;
     }
 
     //Вспомогательные методы
