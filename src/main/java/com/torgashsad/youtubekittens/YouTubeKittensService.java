@@ -14,8 +14,6 @@ import java.util.Random;
 
 public class YouTubeKittensService {
 
-    public static final YouTubeKittensService INSTANCE = new YouTubeKittensService();
-
     private static final Logger logger = LogManager.getLogger(YouTubeKittensService.class);
 
     private static final List<String> adjs = Arrays.asList("Cute", "Adorable", "Funny", "Charming", "Lovely");
@@ -34,6 +32,8 @@ public class YouTubeKittensService {
             throw new RuntimeException();
         }
     }
+
+    public static final YouTubeKittensService INSTANCE = new YouTubeKittensService();
 
     /**
      * Запрашивает у YouTube список первых 50 видео c милымы животными по запросу,
