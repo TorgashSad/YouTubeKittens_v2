@@ -2,13 +2,8 @@ package com.torgashsad.youtubekittens.common;
 
 import com.torgashsad.youtubekittens.YouTubeKittensService;
 import lombok.Getter;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Getter
@@ -37,9 +32,9 @@ public enum UserCommands implements Commands {
      * @return
      */
     @Override
-    public Optional<String> getResponse() {
+    public String getResponse() {
 
-        return YouTubeKittensService.INSTANCE.getRandomAnimalVideoURL(getName());
+        return YouTubeKittensService.INSTANCE.getRandomAnimalVideoURL(getName()).get();
     }
 
     /**
@@ -50,7 +45,7 @@ public enum UserCommands implements Commands {
         return name;
     }
 
-    public static Stream<UserCommands> stream() {
+    public static Stream<Commands> stream() {
         return Stream.of(UserCommands.values());
     }
 

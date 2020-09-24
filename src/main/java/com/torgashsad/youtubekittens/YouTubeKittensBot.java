@@ -1,5 +1,6 @@
 package com.torgashsad.youtubekittens;
 
+import com.torgashsad.youtubekittens.common.Commands;
 import com.torgashsad.youtubekittens.common.SystemCommands;
 import com.torgashsad.youtubekittens.common.UserCommands;
 import lombok.AllArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @AllArgsConstructor
 public class YouTubeKittensBot extends TelegramLongPollingBot {
@@ -39,7 +41,7 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
             SendMessage message = new SendMessage();
             message.setChatId(chatId);
             message.setReplyMarkup(getReplyKeyboardMarkUp());
-            String reply = util.getCommand(inputText).getResponse;
+            String reply = util.getCommand(inputText).getResponse();
             message.setText(reply);
             try {
                 execute(message);
@@ -80,7 +82,7 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
     // представляющий из себя клавиатуру с кнопками, ссответствующими списку строк
     private ReplyKeyboardMarkup getReplyKeyboardMarkUp() {
         KeyboardRow key = new KeyboardRow();
-        key.addAll(UserCommands.stream().map(UserCommands::getButtonText).collect(Collectors.toList()));
+        key.addAll(UserCommands.stream().map(Commands::getButtonText).collect(Collectors.toList()));
         List<KeyboardRow> keyboard = new ArrayList<>();
         keyboard.add(key);
         ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
@@ -98,23 +100,26 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
          * Возвращает true если содержится, иначе false
          */
         public static boolean userStringCheck (String inputText) {
-            return UserCommands.stream().map(UserCommands::getButtonText).anyMatch(n -> n.equals(inputText)) ||
-                    SystemCommands.stream().map(SystemCommands::getButtonText).anyMatch(n -> n.equals(inputText));
+            return Stream.concat(UserCommands.stream(), SystemCommands.stream()).map(Commands::getName).anyMatch(n -> n.equals(inputText));
         }
 
         /**
          * Данный метод возвращает объект, реализующий интерфейс Command, соответствующий строке inputText.
          */
-        public static Object getCommand (String inputText) {
-            Optional<SystemCommands> fromSC = SystemCommands.stream()
+        public static Commands getCommand (String inputText) {
+
+            Optional<Commands> optCommand=Stream.concat(UserCommands.stream(), SystemCommands.stream())
+                    .filter(d -> d.getButtonText().equals(inputText))
+                    .findAny();
+            Commands command = optCommand.get();
+
+            /*Optional<SystemCommands> fromSC = SystemCommands.stream()
                     .filter(d -> d.getButtonText().equals(inputText))
                     .findAny();
             Optional<UserCommands> fromUC = UserCommands.stream()
                     .filter(d -> d.getButtonText().equals(inputText))
-                    .findAny();
-            if (fromSC.isPresent()) return fromSC;
-            else
-            return fromUC;
+                    .findAny();*/
+            return command;
         }
     }
 }
