@@ -11,30 +11,47 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 
+/**
+ * Service that uses YouTube Data API to get random animal videos from YouTube
+ */
 
 public class YouTubeKittensService {
-
-    private static final Logger logger = LogManager.getLogger(YouTubeKittensService.class);
-
-    private static final List<String> adjs = Arrays.asList("Cute", "Adorable", "Funny", "Charming", "Lovely");
-    private static final String YouTubeURLBeginning = "https://www.youtube.com/watch?v=";
-    private static final long MaxResults = 50;
-    private static final Random rand = new Random();
+    /**
+     * Logger initialization
+     */
+    private static final Logger LOGGER = LogManager.getLogger(YouTubeKittensService.class);
+    /**
+     * The list of adjectives that are randomly added to the YouTube query
+     */
+    private static final List<String> ADJECTIVES = Arrays.asList("Cute", "Adorable", "Funny", "Charming", "Lovely");
+    /**
+     * The begging of a YouTube video link
+     */
+    private static final String YOU_TUBE_URL_BEGINNING = "https://www.youtube.com/watch?v=";
+    /**
+     * Maximum number of results for YouTube response
+     */
+    private static final long MAX_RESULTS = 50;
+    /**
+     * A Random class object for random selection
+     */
+    private static final Random RANDOM = new Random();
 
     private final YouTube youtubeService;
 
     private YouTubeKittensService() {
         try {
-            logger.info("MY POINT 3");
             this.youtubeService = YTServiceSupplier.getService();
         } catch (Exception e) {
-            logger.error("Error on YouTubeService initialization", e);
+            LOGGER.error("Error on YouTubeService initialization", e);
             throw new RuntimeException();
         }
     }
-
+    /**
+     * A singleton of YouTubeKittensService
+     */
     public static final YouTubeKittensService INSTANCE = new YouTubeKittensService();
-
+    // TODO: 24.09.2020 CONTINUE HERE
     /**
      * Запрашивает у YouTube список первых 50 видео c милымы животными по запросу,
      * определённому строкой q, возвращает URL со случайным видео из этого списка
@@ -48,19 +65,19 @@ public class YouTubeKittensService {
             request = youtubeService.search()
                     .list("snippet");
         } catch (IOException e) {
-            logger.error(e);
+            LOGGER.error(e);
             return Optional.empty();
         }
-        logger.info("YouTube query happened to be:"+adjs.get(rand.nextInt(adjs.size())) + " " + query);
+        LOGGER.info("YouTube query happened to be:"+ ADJECTIVES.get(RANDOM.nextInt(ADJECTIVES.size())) + " " + query);
         try {
-            SearchListResponse response = request.setMaxResults(MaxResults) //Количество результатов в ответе
-                        .setQ(adjs.get(rand.nextInt(adjs.size())) + " " + query) //Поисковой запрос
+            SearchListResponse response = request.setMaxResults(MAX_RESULTS) //Количество результатов в ответе
+                        .setQ(ADJECTIVES.get(RANDOM.nextInt(ADJECTIVES.size())) + " " + query) //Поисковой запрос
                         .setType("video") //искать только видео
                         .execute();
             //Вернуть URL c котятами
-            return getYouTubeVideoId(response).map(id -> YouTubeURLBeginning + id);
+            return getYouTubeVideoId(response).map(id -> YOU_TUBE_URL_BEGINNING + id);
         } catch (IOException e) {
-            logger.error(e);
+            LOGGER.error(e);
         }
         return Optional.empty();
 
@@ -69,6 +86,6 @@ public class YouTubeKittensService {
     //извлекает Id случайного видео в формате String из ответа YouTube форматаSearchListResponse.
     private Optional<String> getYouTubeVideoId(SearchListResponse response) {
         return response.getItems().stream().map(item ->
-                item.getId().getVideoId()).skip(rand.nextInt(response.getItems().size())).findAny();
+                item.getId().getVideoId()).skip(RANDOM.nextInt(response.getItems().size())).findAny();
     }
 }

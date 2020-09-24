@@ -2,6 +2,10 @@ package com.torgashsad.youtubekittens.common;
 
 import java.util.stream.Stream;
 
+/**
+ * Contains a list (in enum format) of system commands, available for Telegram Bot
+ */
+
 public enum SystemCommands implements Commands {
     HELP("/help") {
         @Override
@@ -10,7 +14,7 @@ public enum SystemCommands implements Commands {
                     "Just choose a button and get an animal video specified by the button.\n" +
                     "All videos are random and tend to not repeat, but rarely repetitions occur.\n" +
                     "In that unfortunate case, just click the button once more!\n" +
-                    "type /start to restart the but if something have gone wrong.\n" +
+                    "type /start to restart the but if something went wrong.\n" +
                     "type /help to get this help again";
         }
     },
@@ -27,12 +31,15 @@ public enum SystemCommands implements Commands {
     }
 
     /**
-     * Return the name of the request
+     * @return the name of the request
      */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return a stream of values of SystemCommands enum
+     */
     public static Stream<Commands> stream() {
         return Stream.of(SystemCommands.values());
     }

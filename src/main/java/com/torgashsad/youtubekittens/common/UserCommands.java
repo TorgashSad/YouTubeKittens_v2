@@ -4,6 +4,11 @@ import com.torgashsad.youtubekittens.YouTubeKittensService;
 
 import java.util.stream.Stream;
 
+/**
+ * Contains a list (in enum format) of non-system commands, available for Telegram Bot
+ * At the moment (24.09.2020), consists of animal names
+ */
+
 public enum UserCommands implements Commands {
     HAMSTERS("hamsters"),
     KITTENS("kittens"),
@@ -17,7 +22,7 @@ public enum UserCommands implements Commands {
     }
 
     /**
-     * Returns the text on the button that corresponds to the name of the request
+     * @return the text on the button in a specific format that corresponds to the name of the request
      */
     @Override
     public String getButtonText() {
@@ -25,7 +30,8 @@ public enum UserCommands implements Commands {
     }
 
     /**
-     * Returns the response that corresponds to the name of the request
+     * @return the response that corresponds to the name of the request
+     * Uses a singleton of YouTubeKittensService class in order to get the response
      */
     public String getResponse() {
 
@@ -33,12 +39,15 @@ public enum UserCommands implements Commands {
     }
 
     /**
-     * Return the name of the request
+     * @return the name of the request
      */
     public String getName() {
         return name;
     }
 
+    /**
+     * @return a stream of values of SystemCommands enum
+     */
     public static Stream<Commands> stream() {
         return Stream.of(UserCommands.values());
     }
