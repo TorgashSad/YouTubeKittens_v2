@@ -27,9 +27,10 @@ public class YouTubeKittensService {
 
     private YouTubeKittensService() {
         try {
+            logger.info("MY POINT 3");
             this.youtubeService = YTServiceSupplier.getService();
         } catch (Exception e) {
-            logger.error("Error on initialization YouTubeService", e);
+            logger.error("Error on YouTubeService initialization", e);
             throw new RuntimeException();
         }
     }

@@ -1,18 +1,9 @@
 package com.torgashsad.youtubekittens.common;
 
-import lombok.Getter;
-
 import java.util.stream.Stream;
 
-@Getter
 public enum SystemCommands implements Commands {
     HELP("/help") {
-        @Override
-        public String getResponse() {
-            return "Hello. This is start message. PRESS A BUTTON TO GET ANIMALS!!!";
-        }
-    },
-    START("/start") {
         @Override
         public String getResponse() {
             return "This is a bot that sends you random videos with animals according to your preferences.\n" +
@@ -21,6 +12,12 @@ public enum SystemCommands implements Commands {
                     "In that unfortunate case, just click the button once more!\n" +
                     "type /start to restart the but if something have gone wrong.\n" +
                     "type /help to get this help again";
+        }
+    },
+    START("/start") {
+        @Override
+        public String getResponse() {
+            return "Hello. This is start message. PRESS A BUTTON TO GET ANIMALS!!!";
         }
     };
     private final String name;
@@ -32,11 +29,9 @@ public enum SystemCommands implements Commands {
     /**
      * Return the name of the request
      */
-    @Override
     public String getName() {
         return name;
     }
-
 
     public static Stream<Commands> stream() {
         return Stream.of(SystemCommands.values());

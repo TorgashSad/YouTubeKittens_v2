@@ -4,6 +4,8 @@ import com.torgashsad.youtubekittens.common.Commands;
 import com.torgashsad.youtubekittens.common.SystemCommands;
 import com.torgashsad.youtubekittens.common.UserCommands;
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.TelegramBotsApi;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
@@ -14,7 +16,6 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiRequestException;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -22,12 +23,9 @@ import java.util.stream.Stream;
 
 @AllArgsConstructor
 public class YouTubeKittensBot extends TelegramLongPollingBot {
-
+    private static final Logger logger = LogManager.getLogger(YouTubeKittensBot.class);
     final private static int RECONNECT_PAUSE = 10000;
-    final private static List<String> animals = Arrays.asList("kittens", "puppies", "parrots", "hamsters");
-
     final private String userName;
-
     final private String token;
 
 
@@ -36,17 +34,16 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
 
         Long chatId = update.getMessage().getChatId();
         String inputText = update.getMessage().getText();
-
+        System.out.println(util.userStringCheck(inputText));
         if (util.userStringCheck(inputText)) {
             SendMessage message = new SendMessage();
             message.setChatId(chatId);
             message.setReplyMarkup(getReplyKeyboardMarkUp());
-            String reply = util.getCommand(inputText).getResponse();
-            message.setText(reply);
+            message.setText(util.getCommand(inputText).getResponse());
             try {
                 execute(message);
             } catch (TelegramApiException e) {
-                e.printStackTrace();
+                logger.error("Error on sending message to Telegram", e);
             }
         }
     }
@@ -67,11 +64,11 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
             telegramBotsApi.registerBot(this);
 
         } catch (TelegramApiRequestException e) {
-
+            logger.error("Wasn't able to register the bot", e);
             try {
                 Thread.sleep(RECONNECT_PAUSE);
             } catch (InterruptedException e1) {
-                e1.printStackTrace();
+                logger.error(e1);
                 return;
             }
             botConnect();
@@ -100,7 +97,7 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
          * Возвращает true если содержится, иначе false
          */
         public static boolean userStringCheck (String inputText) {
-            return Stream.concat(UserCommands.stream(), SystemCommands.stream()).map(Commands::getName).anyMatch(n -> n.equals(inputText));
+            return Stream.concat(UserCommands.stream(), SystemCommands.stream()).map(Commands::getButtonText).anyMatch(n -> n.equals(inputText));
         }
 
         /**
@@ -111,15 +108,7 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
             Optional<Commands> optCommand=Stream.concat(UserCommands.stream(), SystemCommands.stream())
                     .filter(d -> d.getButtonText().equals(inputText))
                     .findAny();
-            Commands command = optCommand.get();
-
-            /*Optional<SystemCommands> fromSC = SystemCommands.stream()
-                    .filter(d -> d.getButtonText().equals(inputText))
-                    .findAny();
-            Optional<UserCommands> fromUC = UserCommands.stream()
-                    .filter(d -> d.getButtonText().equals(inputText))
-                    .findAny();*/
-            return command;
+            return optCommand.orElseThrow();
         }
     }
 }

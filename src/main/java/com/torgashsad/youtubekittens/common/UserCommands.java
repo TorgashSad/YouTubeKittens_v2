@@ -1,12 +1,9 @@
 package com.torgashsad.youtubekittens.common;
 
 import com.torgashsad.youtubekittens.YouTubeKittensService;
-import lombok.Getter;
 
-import java.util.Optional;
 import java.util.stream.Stream;
 
-@Getter
 public enum UserCommands implements Commands {
     HAMSTERS("hamsters"),
     KITTENS("kittens"),
@@ -29,18 +26,15 @@ public enum UserCommands implements Commands {
 
     /**
      * Returns the response that corresponds to the name of the request
-     * @return
      */
-    @Override
     public String getResponse() {
 
-        return YouTubeKittensService.INSTANCE.getRandomAnimalVideoURL(getName()).get();
+        return YouTubeKittensService.INSTANCE.getRandomAnimalVideoURL(getName()).orElseThrow();
     }
 
     /**
      * Return the name of the request
      */
-    @Override
     public String getName() {
         return name;
     }

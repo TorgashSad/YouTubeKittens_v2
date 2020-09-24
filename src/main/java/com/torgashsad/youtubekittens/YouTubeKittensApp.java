@@ -13,12 +13,10 @@ public class YouTubeKittensApp {
 
     private static final Logger logger = LogManager.getLogger(YouTubeKittensApp.class);
 
-    public static void main(String[] args)
-            throws GeneralSecurityException, IOException {
+    public static void main(String[] args) {
         //Получаем серсис YouTube
         //YouTubeKittensService MyService = new YouTubeKittensService(YTServiceSupplier.getService());
         ApiContextInitializer.init(); //Initialization of ApiContext
-
         //Читаем файл настроек, в которых хранится Telegram Bot Token
         FileInputStream fis;
         Properties property = new Properties();
@@ -32,5 +30,6 @@ public class YouTubeKittensApp {
         }
         YouTubeKittensBot YouTubeKittensBot = new YouTubeKittensBot("YouTubeKittensBot", telegramBotToken);
         YouTubeKittensBot.botConnect();
+        logger.info("MY POINT 2");
     }
 }
