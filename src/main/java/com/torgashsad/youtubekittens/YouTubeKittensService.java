@@ -21,11 +21,11 @@ public class YouTubeKittensService {
      */
     private static final Logger LOGGER = LogManager.getLogger(YouTubeKittensService.class);
     /**
-     * The list of adjectives that are randomly added to the YouTube query
+     * The list of adjectives that are randomly added to a YouTube query
      */
     private static final List<String> ADJECTIVES = Arrays.asList("Cute", "Adorable", "Funny", "Charming", "Lovely");
     /**
-     * The begging of a YouTube video link
+     * The beginning of a YouTube video link
      */
     private static final String YOU_TUBE_URL_BEGINNING = "https://www.youtube.com/watch?v=";
     /**
@@ -51,12 +51,11 @@ public class YouTubeKittensService {
      * A singleton of YouTubeKittensService
      */
     public static final YouTubeKittensService INSTANCE = new YouTubeKittensService();
-    // TODO: 24.09.2020 CONTINUE HERE
     /**
-     * Запрашивает у YouTube список первых 50 видео c милымы животными по запросу,
-     * определённому строкой q, возвращает URL со случайным видео из этого списка
-     *
-     * @param query строка
+     * Asks YouTube for a list of MAX_RESULTS first videos on YouTube for a query, supplemented my a random
+     * adjective from ADJECTIVES
+     * @param query base input query
+     * @return an URL to a random video from YouTube response
      */
     public Optional<String> getRandomAnimalVideoURL(String query) {
         // Define and execute the API request
@@ -68,13 +67,13 @@ public class YouTubeKittensService {
             LOGGER.error(e);
             return Optional.empty();
         }
-        LOGGER.info("YouTube query happened to be:"+ ADJECTIVES.get(RANDOM.nextInt(ADJECTIVES.size())) + " " + query);
+        String ytquery = ADJECTIVES.get(RANDOM.nextInt(ADJECTIVES.size())) + " " + query;
+        LOGGER.info("YouTube query happened to be: " + ytquery);
         try {
-            SearchListResponse response = request.setMaxResults(MAX_RESULTS) //Количество результатов в ответе
-                        .setQ(ADJECTIVES.get(RANDOM.nextInt(ADJECTIVES.size())) + " " + query) //Поисковой запрос
-                        .setType("video") //искать только видео
+            SearchListResponse response = request.setMaxResults(MAX_RESULTS)
+                        .setQ(ytquery)
+                        .setType("video") //Search only for videos
                         .execute();
-            //Вернуть URL c котятами
             return getYouTubeVideoId(response).map(id -> YOU_TUBE_URL_BEGINNING + id);
         } catch (IOException e) {
             LOGGER.error(e);
@@ -83,7 +82,11 @@ public class YouTubeKittensService {
 
     }
 
-    //извлекает Id случайного видео в формате String из ответа YouTube форматаSearchListResponse.
+    /**
+     * Extracts an Id of a random video from YouTube response
+     * @param response YouTube response
+     * @return an Optional object containing an Id
+     */
     private Optional<String> getYouTubeVideoId(SearchListResponse response) {
         return response.getItems().stream().map(item ->
                 item.getId().getVideoId()).skip(RANDOM.nextInt(response.getItems().size())).findAny();

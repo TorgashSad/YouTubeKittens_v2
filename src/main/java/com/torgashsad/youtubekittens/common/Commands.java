@@ -6,7 +6,8 @@ package com.torgashsad.youtubekittens.common;
 
 public interface Commands {
     /**
-     * @return the text on the button that corresponds to the name of the command
+     * @return the text on the button that corresponds to the name of the command.
+     * By default, return the name of the command
      */
     default String getButtonText() {
         return getName();

@@ -40,7 +40,7 @@ dependencies {
 
 application {
     // Define the main class for the application.
-    mainClassName = 'com.torgashsad.youtubekittens.YouTubeKittensApp'
+    mainClassName = 'com.torgashsad.youtubekittens.YouTubeKittensApplication'
     sourceCompatibility = 1.8
     targetCompatibility = 1.8
     version = '1.0'

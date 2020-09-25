@@ -40,7 +40,7 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
     final private String botToken;
 
     /**
-     * This method is executed every time user send new message to Telegram Bot
+     * This method is executed every time user sends new message to Telegram Bot
      * @param update an object that contains information about user and his request
      */
     @Override
@@ -69,14 +69,13 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
     /**
      * Telegram specific bot connection method
      */
-
     public void botConnect() {
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         try {
             telegramBotsApi.registerBot(this);
 
         } catch (TelegramApiRequestException e) {
-            LOGGER.error("Wasn't able to register the bot", e);
+            LOGGER.error("Wasn't able to register the bot. Reconnecting...", e);
             try {
                 Thread.sleep(RECONNECT_PAUSE);
             } catch (InterruptedException e1) {
@@ -118,7 +117,7 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
         }
 
         /**
-         * This method returns an object that implements interface Command defined by
+         * This method returns an object that implements interface Command defined by inputText string
          * @param inputText input text
          * @return object that implements interface Command
          */

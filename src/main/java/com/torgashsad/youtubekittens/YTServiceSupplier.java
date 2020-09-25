@@ -1,9 +1,4 @@
 package com.torgashsad.youtubekittens;
-/*
-  Sample Java code for youtube.search.list
-  See instructions for running these code samples locally:
-  https://developers.google.com/explorer-help/guides/code_samples#java
- */
 
 import com.google.api.client.auth.oauth2.Credential;
 import com.google.api.client.extensions.java6.auth.oauth2.AuthorizationCodeInstalledApp;
@@ -23,6 +18,9 @@ import java.security.GeneralSecurityException;
 import java.util.Collection;
 import java.util.Collections;
 
+/**
+ * YouTube service supplier provided by YouTube Data API
+ */
 public class YTServiceSupplier {
     private static final String CLIENT_SECRETS= "/client_secret.json";
     private static final Collection<String> SCOPES =
@@ -35,7 +33,6 @@ public class YTServiceSupplier {
      * Create an authorized Credential object.
      *
      * @return an authorized Credential object.
-     * @throws IOException
      */
     public static Credential authorize(final NetHttpTransport httpTransport) throws IOException {
         // Load client secrets.

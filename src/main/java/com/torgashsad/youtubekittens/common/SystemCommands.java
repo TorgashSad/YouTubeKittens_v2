@@ -8,7 +8,6 @@ import java.util.stream.Stream;
 
 public enum SystemCommands implements Commands {
     HELP("/help") {
-        @Override
         public String getResponse() {
             return "This is a bot that sends you random videos with animals according to your preferences.\n" +
                     "Just choose a button and get an animal video specified by the button.\n" +
@@ -19,7 +18,6 @@ public enum SystemCommands implements Commands {
         }
     },
     START("/start") {
-        @Override
         public String getResponse() {
             return "Hello. This is start message. PRESS A BUTTON TO GET ANIMALS!!!";
         }
@@ -30,9 +28,6 @@ public enum SystemCommands implements Commands {
         this.name = name;
     }
 
-    /**
-     * @return the name of the request
-     */
     public String getName() {
         return name;
     }

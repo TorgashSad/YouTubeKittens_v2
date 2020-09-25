@@ -1,7 +1,6 @@
 package com.torgashsad.youtubekittens.common;
 
 import com.torgashsad.youtubekittens.YouTubeKittensService;
-
 import java.util.stream.Stream;
 
 /**
@@ -34,19 +33,15 @@ public enum UserCommands implements Commands {
      * Uses a singleton of YouTubeKittensService class in order to get the response
      */
     public String getResponse() {
-
         return YouTubeKittensService.INSTANCE.getRandomAnimalVideoURL(getName()).orElseThrow();
     }
 
-    /**
-     * @return the name of the request
-     */
     public String getName() {
         return name;
     }
 
     /**
-     * @return a stream of values of SystemCommands enum
+     * @return a stream of values of UserCommands enum
      */
     public static Stream<Commands> stream() {
         return Stream.of(UserCommands.values());
