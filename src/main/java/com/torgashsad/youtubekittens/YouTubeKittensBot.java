@@ -26,7 +26,6 @@ import java.util.stream.Stream;
  * @author AAV
  */
 @AllArgsConstructor
-@Getter
 public class YouTubeKittensBot extends TelegramLongPollingBot {
     /**
      * Logger initialization
@@ -36,7 +35,9 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
      * Reconnect pause in the case of unsuccessful bot registration
      */
     final private static int RECONNECT_PAUSE = 10000;
+    @Getter
     final private String botUsername;
+    @Getter
     final private String botToken;
 
     /**
@@ -53,8 +54,8 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
         message.setChatId(chatId);
         //Setting a reply keyboard
         message.setReplyMarkup(getReplyKeyboardMarkUp());
-        if (util.userStringCheck(inputText)) {
-            message.setText(util.getCommand(inputText).getResponse());
+        if (userStringCheck(inputText)) {
+            message.setText(getCommand(inputText).getResponse());
         }
         else {message.setText("Unfortunately, i don't know this command yet :( \n" +
                 "Enter /help to see available commands");
@@ -73,7 +74,6 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         try {
             telegramBotsApi.registerBot(this);
-
         } catch (TelegramApiRequestException e) {
             LOGGER.error("Wasn't able to register the bot. Reconnecting...", e);
             try {
@@ -101,32 +101,34 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
         replyKeyboardMarkup.setResizeKeyboard(true);
         return replyKeyboardMarkup;
     }
+    /**
+     * This method check if the list of available commands contains input text
+     * @param inputText input text
+     * @return true if input text is present in available commands
+     */
+    private boolean userStringCheck (String inputText) {
+        return getAllCommands()
+                .map(Commands::getButtonText)
+                .anyMatch(n -> n.equals(inputText));
+    }
 
     /**
-     * Utility methods for YouTubeKittensBot
+     * This method returns an object that implements interface Command defined by inputText string
+     * @param inputText input text
+     * @return object that implements interface Command
      */
-    private static class util {
+    private Commands getCommand (String inputText) {
 
-        /**
-         * This method check if the list of available commands contains input text
-         * @param inputText input text
-         * @return true if input text is present in available commands
-         */
-        public static boolean userStringCheck (String inputText) {
-            return Stream.concat(UserCommands.stream(), SystemCommands.stream()).map(Commands::getButtonText).anyMatch(n -> n.equals(inputText));
-        }
+        Optional<Commands> optCommand = getAllCommands()
+                .filter(command -> command.getButtonText().equals(inputText))
+                .findAny();
+        return optCommand.orElseThrow();
+    }
 
-        /**
-         * This method returns an object that implements interface Command defined by inputText string
-         * @param inputText input text
-         * @return object that implements interface Command
-         */
-        public static Commands getCommand (String inputText) {
-
-            Optional<Commands> optCommand=Stream.concat(UserCommands.stream(), SystemCommands.stream())
-                    .filter(d -> d.getButtonText().equals(inputText))
-                    .findAny();
-            return optCommand.orElseThrow();
-        }
+    /**
+     * @return ALL Bot command as a Stream<Commands>
+     */
+    private Stream<Commands> getAllCommands() {
+        return Stream.concat(UserCommands.stream(), SystemCommands.stream());
     }
 }

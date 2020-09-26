@@ -16,23 +16,17 @@ public class YouTubeKittensApplication {
      * Logger initialization
      */
     private static final Logger LOGGER = LogManager.getLogger(YouTubeKittensApplication.class);
-
     /**
      * Path/name of the configuration file
      */
     private static final String CONFIGURATION_FILE_NAME = "config.properties";
-
     /**
      * YouTubeKittens Bot username
      */
     private static final String YOUTUBE_KITTENS_BOT_USERNAME = "YouTubeKittensBot";
 
-    /**
-     * Main method gets the value of Telegram Bot token and, using it, starts the bot
-     */
     public static void main(String[] args) {
         ApiContextInitializer.init(); //Initialization of ApiContext (Telegram API specific)
-        // TODO: 24.09.2020 Improve Telegram Bot Token obtaining
         Properties property = readPropertiesFile();
         String telegramBotToken = property.getProperty("telegramBotToken");
         YouTubeKittensBot YouTubeKittensBot = new YouTubeKittensBot(YOUTUBE_KITTENS_BOT_USERNAME, telegramBotToken);
