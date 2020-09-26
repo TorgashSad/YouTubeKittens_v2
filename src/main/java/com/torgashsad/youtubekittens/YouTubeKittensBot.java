@@ -35,6 +35,11 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
      * Reconnect pause in the case of unsuccessful bot registration
      */
     final private static int RECONNECT_PAUSE = 10000;
+    /**
+     * General response for an unknown command
+     */
+    public static final String UNKNOWN_COMMAND_RESPONSE = "Unfortunately, i don't know this command yet :( \n" +
+            "Enter /help to see available commands";
     @Getter
     final private String botUsername;
     @Getter
@@ -57,8 +62,7 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
         if (userStringCheck(inputText)) {
             message.setText(getCommand(inputText).getResponse());
         }
-        else {message.setText("Unfortunately, i don't know this command yet :( \n" +
-                "Enter /help to see available commands");
+        else {message.setText(UNKNOWN_COMMAND_RESPONSE);
         }
         try {
             execute(message);
