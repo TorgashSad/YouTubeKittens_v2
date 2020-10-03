@@ -3,8 +3,6 @@ package com.torgashsad.youtubekittens;
 import com.torgashsad.youtubekittens.common.Commands;
 import com.torgashsad.youtubekittens.common.SystemCommands;
 import com.torgashsad.youtubekittens.common.UserCommands;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
@@ -21,11 +19,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
 /**
  * This class represents a telegram bot that send cute animal videos the user
  * @author AAV
  */
-@AllArgsConstructor
 public class YouTubeKittensBot extends TelegramLongPollingBot {
     /**
      * Logger initialization
@@ -40,11 +38,16 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
      */
     public static final String UNKNOWN_COMMAND_RESPONSE = "Unfortunately, i don't know this command yet :( \n" +
             "Enter /help to see available commands";
-    @Getter
+
     final private String botUsername;
-    @Getter
     final private String botToken;
 
+
+
+    public YouTubeKittensBot(String botUsername, String botToken) {
+        this.botUsername=botUsername;
+        this.botToken=botToken;
+    }
     /**
      * This method is executed every time user sends new message to Telegram Bot
      * @param update an object that contains information about user and his request
@@ -69,6 +72,16 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
         } catch (TelegramApiException e) {
             LOGGER.error("Error on sending message to Telegram", e);
         }
+    }
+
+    @Override
+    public String getBotUsername() {
+        return botUsername;
+    }
+
+    @Override
+    public String getBotToken() {
+        return botToken;
     }
 
     /**
@@ -135,4 +148,6 @@ public class YouTubeKittensBot extends TelegramLongPollingBot {
     private Stream<Commands> getAllCommands() {
         return Stream.concat(UserCommands.stream(), SystemCommands.stream());
     }
+
+
 }
