@@ -7,7 +7,7 @@ import java.util.stream.Stream;
  */
 
 public enum SystemCommands implements Commands {
-    HELP("/help") {
+    HELP("help") {
         public String getResponse() {
             return "This is a bot that sends you random videos with animals according to your preferences.\n" +
                     "Just choose a button and get an animal video specified by the button.\n" +
@@ -18,7 +18,7 @@ public enum SystemCommands implements Commands {
                     "Создатель: Антонюк Алексей Витальевич";
         }
     },
-    START("/start") {
+    START("start") {
         public String getResponse() {
             return "Hello. This is start message. PRESS A BUTTON TO GET ANIMALS!!!\n" +
                     "Type /help for help";
@@ -31,7 +31,7 @@ public enum SystemCommands implements Commands {
     }
 
     public String getName() {
-        return name;
+        return "/"+name;
     }
 
     /**
