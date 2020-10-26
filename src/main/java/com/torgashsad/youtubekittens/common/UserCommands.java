@@ -1,6 +1,10 @@
 package com.torgashsad.youtubekittens.common;
 
+import com.torgashsad.youtubekittens.SpringConfig;
 import com.torgashsad.youtubekittens.YouTubeKittensService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+
 import java.util.stream.Stream;
 
 /**
@@ -15,6 +19,13 @@ public enum UserCommands implements Commands {
     PUPPIES("puppies");
 
     private final String name;
+
+    public static class StaticYouTubeKittensService {
+        static AnnotationConfigApplicationContext context =
+                new AnnotationConfigApplicationContext(SpringConfig.class);
+        static YouTubeKittensService youTubeKittensService
+                = context.getBean("youTubeKittensService", YouTubeKittensService.class);
+    }
 
     UserCommands(String name)  {
         this.name = name;
@@ -33,7 +44,10 @@ public enum UserCommands implements Commands {
      * Uses a singleton of YouTubeKittensService class in order to get the response
      */
     public String getResponse() {
-        return YouTubeKittensService.INSTANCE.getRandomAnimalVideoURL(getName()).orElseThrow();
+        return StaticYouTubeKittensService
+                .youTubeKittensService
+                .getRandomAnimalVideoURL(getName())
+                .orElseThrow();
     }
 
     public String getName() {

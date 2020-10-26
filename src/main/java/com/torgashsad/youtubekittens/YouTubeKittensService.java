@@ -4,6 +4,8 @@ import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.SearchListResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -14,7 +16,7 @@ import java.util.Random;
 /**
  * Service that uses YouTube Data API to get random animal videos from YouTube
  */
-
+@Component
 public class YouTubeKittensService {
     /**
      * Logger initialization
@@ -39,18 +41,11 @@ public class YouTubeKittensService {
 
     private final YouTube youtubeService;
 
-    private YouTubeKittensService() {
-        try {
-            this.youtubeService = YTServiceSupplier.getService();
-        } catch (Exception e) {
-            LOGGER.error("Error on YouTubeService initialization", e);
-            throw new RuntimeException();
-        }
+    @Autowired
+    private YouTubeKittensService(YouTube youtube) {
+        youtubeService=youtube;
     }
-    /**
-     * A singleton of YouTubeKittensService
-     */
-    public static final YouTubeKittensService INSTANCE = new YouTubeKittensService();
+
     /**
      * Asks YouTube for a list of MAX_RESULTS first videos on YouTube for a query, supplemented my a random
      * adjective from ADJECTIVES
